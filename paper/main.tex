@@ -1,0 +1,95 @@
+% Roman Urdu transliteration paper. Build: tectonic main.tex (or pdflatex + bibtex), e.g. on Overleaf.
+% Every number comes from numbers.tex / tables.tex, written by make_paper.py from the result files.
+% Do not type numbers into this file by hand.
+\documentclass[11pt]{article}
+\usepackage[final]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xspace}
+\xspaceaddexceptions{\%}
+
+\input{numbers.tex}
+
+\title{Two Points from the Frontier:\\An Open 8B Model for Roman Urdu Transliteration, Fine-Tuned on One GPU}
+
+\author{Masood Ahmed \\
+  Independent researcher, Islamabad, Pakistan \\
+  \texttt{masoodd.ahmedd123@gmail.com}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Most Urdu typed on phones is written in the Latin script (Roman Urdu), while most Urdu text worth searching, reading aloud or publishing is in Urdu script. Converting one into the other is a small task with large uses, and today the best tool for it is a frontier chat model. We ask how close a cheap open model can get. We fine-tune Qwen3-8B with QLoRA on public Dakshina data for 68 minutes on a single consumer GPU and test it on \NTest held-out sentences against GPT-6, Claude Fable 5.2, open instruction-tuned models from 3B to 20B parameters, and a dedicated transliteration model from prior work. Our model reaches a character error rate of \OursCER\% (score \OursScore out of 100), within \GapGpt points of GPT-6 (\GptCER\%) and \GapFront of Claude Fable 5.2 (\FableCER\%), and it beats every open model we test by a wide margin: the best of them, \BestOpenName, makes \BestOpenCER\% character errors, so we remove \ErrCut\% of its errors; it also beats the dedicated m2m100 transliterator of prior work (\MtwoMCER\%). A 1.5B model trained the same way already reaches \SmallCER\%. Its word error rate of \OursWER\% compares well with published Dakshina Urdu results. The remaining errors are mostly letters that sound alike and that Roman Urdu does not distinguish. We also report a side finding from our wider benchmark: one frontier model reproduces \ContFableNinety of \ContNTr FLORES English references near-verbatim. We release code, model outputs and the adapters.\footnote{\url{https://github.com/masooddahmedd/roman-urdu-leaderboard}}
+\end{abstract}
+
+\section{Introduction}
+
+Urdu has well over a hundred million speakers, and on phones and social media most of it is typed in the Latin script: \textit{kya aap kal aa sakte hain?} rather than its Urdu-script form. This Roman Urdu has no standard spelling, and it drops distinctions the Urdu script keeps: \textit{s} can be \textit{seen}, \textit{swad} or \textit{se}; \textit{z} can be any of four letters; \textit{t} hides both dental \textit{te} and \textit{toe}, and Roman Urdu writers often do not mark retroflex \textit{\d{t}e} either. Converting Roman Urdu into Urdu script is therefore not a lookup but a small act of language understanding, and it is useful far beyond itself: it lets Roman Urdu queries search Urdu-script documents, where dense retrievers otherwise fail badly \citep{ahmed2026retrieval}, and it gives speech synthesis, publishing and search systems the script they were built for.
+
+Frontier chat models do this very well. They are also closed, paid per call, and send every message to a third party, which rules them out for many products in Pakistan, offline use, and high-volume pipelines. Open models are free to run, but general instruction-tuned models of a size that fits on one GPU do poorly on the task (\S\ref{sec:results}).
+
+We ask a simple question: \emph{with public data and one consumer GPU, how close can an open model get to the frontier on Roman Urdu transliteration?} Our answer is: close. Our contributions are:
+\begin{itemize}
+\item An open Qwen3-8B model fine-tuned in 68 minutes on one 16\,GB GPU that reaches \OursCER\% character error rate, within \GapGpt points of GPT-6 and \GapFront of Claude Fable 5.2, and ahead of every open model we tested, up to 20B parameters, and of a dedicated transliteration model from prior work (\S\ref{sec:results}).
+\item A careful comparison: bootstrap confidence intervals, paired tests, three scorings of the same outputs, and an error analysis showing that what remains is mostly sound-alike letters (\S\ref{sec:analysis}).
+\item A side finding on evaluation hygiene: one frontier model reproduces \ContFableNinety of \ContNTr FLORES references near-verbatim when translating Roman Urdu passages, while the other reproduces none (\S\ref{sec:contamination}).
+\end{itemize}
+
+\section{Related work}
+
+\paragraph{Dakshina and romanized South Asian languages.} The Dakshina dataset \citep{roark2020dakshina} pairs Wikipedia sentences in twelve South Asian languages, Urdu among them, with romanizations written by native speakers, plus word-level lexicons. \citet{roark2020dakshina} and \citet{kirov2024context} build single-word and context-aware transliterators from the lexicons and native text; the best Urdu system of \citet{kirov2024context}, an ensemble of a noisy-channel model, mT5 and ByT5, reaches 12.1\% word error rate on the official test half. \citet{alam2025normalizer} report 13.5\% WER for GPT-4 Turbo zero-shot and 18.6\% for a LoRA-tuned Gemma-7B on their own split, and \citet{azam2025beyond} benchmark LLMs on word-level Dakshina transliteration. Aksharantar and IndicXlit \citep{madhani2023aksharantar} cover Urdu at the word level. We are not aware of earlier work that compares current frontier models with fine-tuned open LLMs on sentence-level Roman Urdu, reporting character error rate.
+
+\paragraph{Roman Urdu.} Roman-Urdu-Parl \citep{alam2022romanurduparl} is a large parallel Roman Urdu and Urdu corpus, and \citet{butt2025translit} fine-tune m2m100 on it and on Dakshina. Spelling variation in Roman Urdu has been studied for normalization \citep{rafae2015unsupervised,khan2022clustering}. Recent LLM benchmarks with a Roman Urdu side cover medical QA \citep{faheem2026umirage}, safety \citep{jamil2026ruab} and idioms \citep{khan2026idioms}; Belebele \citep{bandarkar2024belebele} includes human-romanized Urdu. \citet{husain2024romansetu} show that LLMs can use romanized text as an interface for Indic languages.
+
+\paragraph{Parameter-efficient fine-tuning.} We use LoRA \citep{hu2022lora} on a 4-bit quantized base model (QLoRA, \citealp{dettmers2023qlora}), which brings 8B fine-tuning within reach of a single consumer GPU.
+
+\section{Setup}
+
+\paragraph{Data.} We use the Urdu romanized sentence data of Dakshina (\citealp{roark2020dakshina}; 9{,}759 sentence pairs in the Hugging Face copy we load). We draw \NTest sentences at random (fixed seed) as the test set and remove every pair whose Urdu side matches a test sentence from training, leaving \NTrainSent training sentences. We add \NTrainLex pseudo-sentences made by grouping the distinct word pairs from the word alignments that Dakshina provides for these training sentences, eight at a time, for \NTrainAll training examples in all. No test sentence and no other benchmark data is used for training or model selection.
+
+\paragraph{Our models.} We fine-tune Qwen3-8B-Base \citep{yang2025qwen3} with QLoRA: 4-bit NF4 base weights, LoRA rank 32 ($\alpha=64$, dropout 0.05) on all attention and MLP projections, learning rate $1.5\times10^{-4}$ with warm-up and cosine decay, effective batch size 16, 2 epochs (1{,}842 steps), sequences up to 256 tokens. Training took 68 minutes on one NVIDIA RTX 4070 Ti SUPER (16\,GB) with a peak of 13.9\,GB. The prompt is a single chat turn asking for the Urdu-script version of the input; the loss covers the answer only. A smaller model, Qwen2.5-1.5B-Instruct \citep{qwen2025qwen25}, is trained the same way for 3 epochs while sharing the GPU with other services (about an hour, capped at 4.4\,GB). We decode greedily.
+
+\paragraph{Baselines.} \emph{Frontier:} GPT-6 (ChatGPT, medium thinking) and Claude Fable 5.2 (claude.ai), queried in the vendors' chat apps in fresh temporary chats, with 30 numbered sentences per request and the same instruction as our models. \emph{Open:} gpt-oss 20B (low reasoning effort), Qwen3 14B \citep{yang2025qwen3} (thinking off), Llama 3.1 8B Instruct \citep{grattafiori2024llama3}, Qwen2.5 7B Instruct and Qwen2.5 3B Instruct \citep{qwen2025qwen25}, run zero-shot through Ollama (4-bit), one sentence per request at temperature 0. \emph{Specialist:} the m2m100 (418M) Roman Urdu to Urdu model released with \citet{butt2025translit}, trained on Roman-Urdu-Parl and Dakshina, decoded with 4 beams.
+
+\paragraph{Metric.}\label{sec:metric} We report character error rate (CER): Levenshtein distance between output and reference divided by reference length, averaged over sentences and capped at 1. Before scoring we apply light Urdu normalization: Unicode NFC, removal of optional diacritics (\textit{aerab}), unification of Arabic and Urdu code points for the same letter (yeh, kaf, heh), removal of zero-width joiners and tatweel, and punctuation mapped to spaces. These choices only remove differences that a reader would not see as errors; \S\ref{sec:analysis} shows the ranking is the same without them. We also report word error rate (WER), the share of sentences with no character error, and 95\% bootstrap confidence intervals (2{,}000 resamples over sentences). Our leaderboard reports 100 minus CER as the score.
+
+\section{Results}\label{sec:results}
+
+\input{tables.tex}
+
+Table~\ref{tab:main} gives the main result. Our 8B model makes \OursCER\% character errors (95\% CI \OursCIlo--\OursCIhi), against \GptCER\% for GPT-6 and \FableCER\% for Claude Fable 5.2: a gap of about two points. It gets \OursExact\% of sentences exactly right, character for character.
+
+Against open models the picture is the reverse. The best open model we tested, \BestOpenName, makes \BestOpenCER\% character errors, \MarginOpen points more than ours; our model removes \ErrCut\% of its errors, and the paired bootstrap interval is far from zero (Table~\ref{tab:paired}). The Qwen2.5 instruction models often leave the Urdu script altogether: Qwen2.5 7B writes Devanagari (Hindi) letters in \QsevenDeva of \NTest outputs and Latin words in \QsevenLatin; our model never writes Devanagari. Fine-tuning, not size, makes the difference: our 1.5B model (\SmallCER\%) is already ahead of every general open model up to 20B parameters, and moving to 8B removes a further \SmallToBigCER points.
+
+Our model also beats the dedicated transliteration model of \citet{butt2025translit} by \MarginMtwoM points of CER (\MtwoMCER\% against \OursCER\%), although that model was trained on Dakshina too and may have seen some of our test sentences, which would only help it.
+
+\paragraph{Comparison with published Dakshina results.} Our WER of \OursWER\% compares favourably with the 12.1\% of the best published Urdu system on the official Dakshina test half \citep{kirov2024context} and the 13.5\% reported for GPT-4 Turbo \citep{alam2025normalizer}. The comparison is indicative only: our test sentences are a random sample of the released sentence data rather than the official split, our scoring normalizes diacritics and letter variants, and unlike \citet{kirov2024context} we train on parallel sentences.
+
+\section{Analysis}\label{sec:analysis}
+
+\paragraph{The result does not depend on the scoring.} Table~\ref{tab:metric} scores the same outputs three ways. Raw scoring (NFC only) adds between \RawAddMin and \RawAddMax points of CER, mostly from diacritics and code-point variants, and leaves the order unchanged. Removing all spaces, which ignores word-boundary errors, does not lower any system's CER noticeably, so the errors are in letters, not in where words split.
+
+\paragraph{What remains is sound-alike letters.} Aligning outputs to references, the most frequent substitutions of our model are \textit{hamza}-on-\textit{yeh} written as plain \textit{yeh}, \textit{swad} written as \textit{seen}, retroflex \textit{\d{t}e} written as dental \textit{te}, and \textit{alif} and \textit{choti he} swapped at word ends. Each pair is written identically or almost identically in Roman Urdu, so the right choice depends on knowing the word, usually a less common or Arabic- or Persian-origin word. Frontier models make the same kinds of errors, only fewer of them: their top confusions are also \textit{hamza}-\textit{yeh} against \textit{yeh}, and \textit{alif} against \textit{choti he}. The general open models, in contrast, make errors of a different kind: wrong letters for common words, \textit{nun ghunna} (the nasal mark) written as a full \textit{nun}, and other scripts.
+
+\section{A note on translation contamination}\label{sec:contamination}
+
+Our wider leaderboard also includes Roman Urdu reading comprehension and translation into English, using the human-romanized Urdu passages of Belebele \citep{bandarkar2024belebele}, whose English side comes from FLORES-200 \citep{nllb2022}. Scoring translations with chrF++ \citep{popovic2017chrf,post2018sacrebleu}, Claude Fable 5.2 reaches \ContFableChrf against \ContGptChrf for GPT-6. The gap is not what it seems: \ContFableNinety of Fable's \ContNTr translations score above 90 sentence-level chrF++ against the FLORES reference, and \ContFableNinetyFive above 95, which for passages of several sentences means near-verbatim reproduction of the reference wording. GPT-6 has \ContGptNinety above 90. This agrees with earlier indirect evidence of FLORES contamination in frontier models \citep{enis2024llm} and with controlled studies of how much contamination inflates translation scores \citep{kocyigit2025overestimation,tan2026flores}. We therefore exclude translation from our leaderboard's overall score and suggest that FLORES-derived test sets should not be used to compare frontier models without a similar check.
+
+\section{Conclusion}
+
+A few thousand public sentence pairs, an open 8B base model and about an hour on one consumer GPU are enough to come within two points of the best frontier models on Roman Urdu to Urdu-script transliteration, and to beat every general open model we tested by a wide margin. The model runs locally, costs nothing per call and keeps text on the device. We release our code, outputs and adapters so others can build on them, for search over Urdu-script documents, speech synthesis from Roman Urdu input, and publishing.
+
+\section*{Limitations}
+
+Our test set is \NTest sentences sampled from the public Dakshina release, not the official test split, and all Dakshina text has been public since 2020; any model, including ours through its base model, may have seen it. Our training data comes from the same source as the test sentences, so our model is in-domain by construction; we have not yet measured it on informal, chat-style Roman Urdu, which is more varied. Frontier models were queried through their consumer chat apps with 30 sentences per request, not through an API with fixed settings, and each was run once. Our model is a transliterator; we do not claim anything about its general Urdu abilities. Finally, references are single Urdu spellings of each sentence; where Urdu allows more than one acceptable spelling, every system is penalized equally.
+
+\bibliography{references}
+
+\end{document}

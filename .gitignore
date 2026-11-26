@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.env
+data/raw/
+data/batches/
+results/raw_old/
+runs/
+paper/*.zip
+paper/*.aux
+paper/*.log
+paper/*.bbl
+paper/*.blg
+paper/*.pdf
+adapters/*/adapter_model.safetensors
+adapters/*.zip

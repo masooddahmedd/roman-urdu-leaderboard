@@ -1,0 +1,235 @@
+{
+ "tasks": [
+  "translit",
+  "reading",
+  "translate_en",
+  "sentiment"
+ ],
+ "overall_tasks": [
+  "translit",
+  "reading",
+  "sentiment"
+ ],
+ "models": [
+  {
+   "slug": "claude__fable-5.2",
+   "name": "Claude Fable 5.2 (claude.ai, medium effort)",
+   "org": "Anthropic",
+   "weights": "closed",
+   "via": "chat app, batched",
+   "flag": {
+    "translate_en": "Reproduces 45 of 120 English references near-verbatim: likely seen in training"
+   },
+   "tasks": {
+    "translit": {
+     "score": 98.6,
+     "cer": 1.44,
+     "wer": 5.96
+    },
+    "reading": {
+     "score": 88.7
+    },
+    "translate_en": {
+     "score": 86.3
+    },
+    "sentiment": {
+     "score": 69.8,
+     "acc": 69.7
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": true,
+   "overall": 85.7
+  },
+  {
+   "slug": "chatgpt__gpt-6",
+   "name": "GPT-6 (ChatGPT, medium thinking)",
+   "org": "OpenAI",
+   "weights": "closed",
+   "via": "chat app, batched",
+   "tasks": {
+    "translit": {
+     "score": 98.4,
+     "cer": 1.63,
+     "wer": 6.66
+    },
+    "reading": {
+     "score": 86.0
+    },
+    "translate_en": {
+     "score": 64.3
+    },
+    "sentiment": {
+     "score": 71.0,
+     "acc": 71.0
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": true,
+   "overall": 85.1
+  },
+  {
+   "slug": "ollama__llama3.1_8b",
+   "name": "Llama 3.1 8B Instruct",
+   "org": "Meta",
+   "weights": "open",
+   "via": "local (Ollama, Q4)",
+   "tasks": {
+    "translit": {
+     "score": 87.5,
+     "cer": 12.46,
+     "wer": 25.85
+    },
+    "reading": {
+     "score": 33.3
+    },
+    "translate_en": {
+     "score": 46.2
+    },
+    "sentiment": {
+     "score": 57.0,
+     "acc": 58.7
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": true,
+   "overall": 59.3
+  },
+  {
+   "slug": "ollama__qwen2.5_7b-instruct",
+   "name": "Qwen2.5 7B Instruct",
+   "org": "Alibaba",
+   "weights": "open",
+   "via": "local (Ollama, Q4)",
+   "tasks": {
+    "translit": {
+     "score": 72.4,
+     "cer": 27.63,
+     "wer": 51.91
+    },
+    "reading": {
+     "score": 39.7
+    },
+    "translate_en": {
+     "score": 42.8
+    },
+    "sentiment": {
+     "score": 54.4,
+     "acc": 54.0
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": true,
+   "overall": 55.5
+  },
+  {
+   "slug": "ollama__qwen2.5_3b-instruct",
+   "name": "Qwen2.5 3B Instruct",
+   "org": "Alibaba",
+   "weights": "open",
+   "via": "local (Ollama, Q4)",
+   "tasks": {
+    "translit": {
+     "score": 62.0,
+     "cer": 38.05,
+     "wer": 63.48
+    },
+    "reading": {
+     "score": 29.7
+    },
+    "translate_en": {
+     "score": 36.2
+    },
+    "sentiment": {
+     "score": 54.3,
+     "acc": 55.7
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": true,
+   "overall": 48.7
+  },
+  {
+   "slug": "m2m100__rup_rur_to_ur",
+   "name": "m2m100 418M Roman Urdu transliterator (Butt et al. 2025)",
+   "org": "Butt et al.",
+   "weights": "open",
+   "via": "local, 4 beams",
+   "tasks": {
+    "translit": {
+     "score": 92.7,
+     "cer": 7.29,
+     "wer": 19.17
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": false
+  },
+  {
+   "slug": "ollama__gpt-oss_20b",
+   "name": "gpt-oss 20B",
+   "org": "OpenAI",
+   "weights": "open",
+   "via": "local (Ollama, low reasoning)",
+   "tasks": {
+    "translit": {
+     "score": 90.2,
+     "cer": 9.8,
+     "wer": 21.27
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": false
+  },
+  {
+   "slug": "ollama__qwen3_14b",
+   "name": "Qwen3 14B",
+   "org": "Alibaba",
+   "weights": "open",
+   "via": "local (Ollama, Q4, thinking off)",
+   "tasks": {
+    "translit": {
+     "score": 90.1,
+     "cer": 9.94,
+     "wer": 22.42
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": false
+  },
+  {
+   "slug": "ours__qwen2.5-1.5b-translit-v2",
+   "name": "Ours: Qwen2.5-1.5B + LoRA (transliteration only)",
+   "org": "Masood Ahmed",
+   "weights": "open",
+   "via": "local, 1-hour fine-tune on one GPU",
+   "ours": true,
+   "tasks": {
+    "translit": {
+     "score": 95.3,
+     "cer": 4.74,
+     "wer": 12.84
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": false
+  },
+  {
+   "slug": "ours__qwen3-8b-translit",
+   "name": "Ours: Qwen3-8B + QLoRA (transliteration only)",
+   "org": "Masood Ahmed",
+   "weights": "open",
+   "via": "local, 68-min fine-tune on one GPU",
+   "ours": true,
+   "tasks": {
+    "translit": {
+     "score": 96.4,
+     "cer": 3.6,
+     "wer": 10.19
+    }
+   },
+   "cost_usd": 0.0,
+   "complete": false
+  }
+ ]
+}

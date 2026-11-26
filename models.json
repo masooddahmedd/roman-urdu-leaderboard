@@ -1,0 +1,184 @@
+{
+ "openai__gpt-6.2-astra": {
+  "name": "GPT-6.2 Astra",
+  "org": "OpenAI",
+  "weights": "closed"
+ },
+ "openai__gpt-6.2-sol": {
+  "name": "GPT-6.2 Sol",
+  "org": "OpenAI",
+  "weights": "closed"
+ },
+ "openai__gpt-6-luna": {
+  "name": "GPT-6 Luna",
+  "org": "OpenAI",
+  "weights": "closed"
+ },
+ "anthropic__claude-fable-5.2": {
+  "name": "Claude Fable 5.2",
+  "org": "Anthropic",
+  "weights": "closed"
+ },
+ "anthropic__claude-opus-5.5": {
+  "name": "Claude Opus 5.5",
+  "org": "Anthropic",
+  "weights": "closed"
+ },
+ "anthropic__claude-sonnet-5.5": {
+  "name": "Claude Sonnet 5.5",
+  "org": "Anthropic",
+  "weights": "closed"
+ },
+ "anthropic__claude-haiku-5.5": {
+  "name": "Claude Haiku 5.5",
+  "org": "Anthropic",
+  "weights": "closed"
+ },
+ "google__gemini-4-neon": {
+  "name": "Gemini 4 Neon",
+  "org": "Google",
+  "weights": "closed"
+ },
+ "google__gemini-3.8-flash": {
+  "name": "Gemini 3.8 Flash",
+  "org": "Google",
+  "weights": "closed"
+ },
+ "x-ai__grok-4.7": {
+  "name": "Grok 4.7",
+  "org": "xAI",
+  "weights": "closed"
+ },
+ "qwen__qwen4-max": {
+  "name": "Qwen4 Max",
+  "org": "Alibaba",
+  "weights": "closed"
+ },
+ "mistralai__mistral-large-4-0": {
+  "name": "Mistral Large 4",
+  "org": "Mistral",
+  "weights": ""
+ },
+ "cohere__command-a-plus": {
+  "name": "Command A Plus",
+  "org": "Cohere",
+  "weights": "closed"
+ },
+ "deepseek__deepseek-v4-pro-0813": {
+  "name": "DeepSeek V4 Pro",
+  "org": "DeepSeek",
+  "weights": "open"
+ },
+ "deepseek__deepseek-v4.1-flash": {
+  "name": "DeepSeek V4.1 Flash",
+  "org": "DeepSeek",
+  "weights": "open"
+ },
+ "moonshotai__kimi-k3.1-pro": {
+  "name": "Kimi K3.1 Pro",
+  "org": "Moonshot",
+  "weights": "open"
+ },
+ "z-ai__glm-5.3": {
+  "name": "GLM-5.3",
+  "org": "Zhipu",
+  "weights": "open"
+ },
+ "qwen__qwen3.8-27b": {
+  "name": "Qwen3.8 27B",
+  "org": "Alibaba",
+  "weights": "open"
+ },
+ "google__gemma-4-31b-it": {
+  "name": "Gemma 4 31B",
+  "org": "Google",
+  "weights": "open"
+ },
+ "meta-llama__llama-4-maverick": {
+  "name": "Llama 4 Maverick",
+  "org": "Meta",
+  "weights": "open"
+ },
+ "meta-llama__llama-3.1-8b-instruct": {
+  "name": "Llama 3.1 8B",
+  "org": "Meta",
+  "weights": "open"
+ },
+ "google__gemma-3-4b-it": {
+  "name": "Gemma 3 4B",
+  "org": "Google",
+  "weights": "open"
+ },
+ "ours__qwen2.5-1.5b-translit": {
+  "name": "Ours: Qwen2.5-1.5B + LoRA (transliteration only)",
+  "org": "Masood Ahmed",
+  "weights": "open",
+  "via": "local, 35-min fine-tune",
+  "ours": true
+ },
+ "chatgpt__gpt-6": {
+  "name": "GPT-6 (ChatGPT, medium thinking)",
+  "org": "OpenAI",
+  "weights": "closed",
+  "via": "chat app, batched"
+ },
+ "claude__fable-5.2": {
+  "name": "Claude Fable 5.2 (claude.ai, medium effort)",
+  "org": "Anthropic",
+  "weights": "closed",
+  "via": "chat app, batched",
+  "flag": {
+   "translate_en": "Reproduces 45 of 120 English references near-verbatim: likely seen in training"
+  }
+ },
+ "ollama__qwen2.5_7b-instruct": {
+  "name": "Qwen2.5 7B Instruct",
+  "org": "Alibaba",
+  "weights": "open",
+  "via": "local (Ollama, Q4)"
+ },
+ "ollama__llama3.1_8b": {
+  "name": "Llama 3.1 8B Instruct",
+  "org": "Meta",
+  "weights": "open",
+  "via": "local (Ollama, Q4)"
+ },
+ "ollama__qwen2.5_3b-instruct": {
+  "name": "Qwen2.5 3B Instruct",
+  "org": "Alibaba",
+  "weights": "open",
+  "via": "local (Ollama, Q4)"
+ },
+ "ours__qwen2.5-1.5b-translit-v2": {
+  "name": "Ours: Qwen2.5-1.5B + LoRA (transliteration only)",
+  "org": "Masood Ahmed",
+  "weights": "open",
+  "via": "local, 1-hour fine-tune on one GPU",
+  "ours": true
+ },
+ "ours__qwen3-8b-translit": {
+  "name": "Ours: Qwen3-8B + QLoRA (transliteration only)",
+  "org": "Masood Ahmed",
+  "weights": "open",
+  "via": "local, 68-min fine-tune on one GPU",
+  "ours": true
+ },
+ "ollama__qwen3_14b": {
+  "name": "Qwen3 14B",
+  "org": "Alibaba",
+  "weights": "open",
+  "via": "local (Ollama, Q4, thinking off)"
+ },
+ "ollama__gpt-oss_20b": {
+  "name": "gpt-oss 20B",
+  "org": "OpenAI",
+  "weights": "open",
+  "via": "local (Ollama, low reasoning)"
+ },
+ "m2m100__rup_rur_to_ur": {
+  "name": "m2m100 418M Roman Urdu transliterator (Butt et al. 2025)",
+  "org": "Butt et al.",
+  "weights": "open",
+  "via": "local, 4 beams"
+ }
+}

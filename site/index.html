@@ -1,0 +1,157 @@
+<title>Roman Urdu Leaderboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; a sample sentence shown in both scripts, then the scoreboard, then method notes. */
+:root{
+  --bg:#f6f8f6; --surface:#ffffff; --fg:#17201c; --muted:#5d6a64; --line:#dde5e0;
+  --accent:#0d6b4f; --accent-soft:#e2f1ea; --ours:#fff4d6; --ours-line:#c9971f; --warn:#a8580c;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --urdu:"Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101614; --surface:#161e1b; --fg:#e7ede9; --muted:#97a59e; --line:#26312c;
+  --accent:#5fcaa2; --accent-soft:#16302a; --ours:#2b2412; --ours-line:#b8892a; --warn:#e3a25a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101614; --surface:#161e1b; --fg:#e7ede9; --muted:#97a59e; --line:#26312c;
+  --accent:#5fcaa2; --accent-soft:#16302a; --ours:#2b2412; --ours-line:#b8892a; --warn:#e3a25a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--body)}
+main{max-width:1060px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;gap:36px}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.08;font-weight:700;letter-spacing:-.015em}
+h2{font-size:20px;font-weight:700}
+.lede{color:var(--muted);max-width:64ch;margin:10px 0 0}
+.sample{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;border-block:1px solid var(--line);padding-block:18px}
+.sample .rom{font-family:var(--mono);font-size:15px;min-width:0}
+.sample .arrow{color:var(--muted);font-family:var(--mono)}
+.sample .ur{font-family:var(--urdu);font-size:22px;line-height:2.1;direction:rtl;text-align:right;min-width:0}
+.sample small{display:block;font-family:var(--body);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);direction:ltr;text-align:inherit;line-height:1.4}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.finding{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.finding b{display:block;font-family:var(--display);font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.finding span{color:var(--muted);font-size:13.5px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:780px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th{font:600 11.5px/1.3 var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);user-select:none}
+th button{all:unset;cursor:pointer}
+th button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+th.l,td.l{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+td.rank{color:var(--muted);font-family:var(--mono);width:36px}
+td .nm{font-weight:600}
+td .via{color:var(--muted);font-size:12.5px}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:8px;vertical-align:2px}
+.tag.open{border-color:var(--accent);color:var(--accent)}
+.overall{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.bar{width:70px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+td.best{color:var(--accent);font-weight:650}
+td.dash{color:var(--muted)}
+td.flag{color:var(--warn)}
+td.flag::after{content:" *";font-weight:700}
+tr.ours td{background:var(--ours)}
+tr.ours td:first-child{box-shadow:inset 3px 0 0 var(--ours-line)}
+.note{color:var(--muted);font-size:13px;margin:10px 2px 0;max-width:80ch}
+section{display:grid;gap:10px;max-width:72ch}
+dl{margin:0;display:grid;gap:12px}
+dt{font-weight:600}
+dd{margin:2px 0 0;color:var(--muted)}
+p{margin:0}
+.foot{color:var(--muted);font-size:13px}
+@media (max-width:560px){.sample{grid-template-columns:1fr}.sample .arrow{display:none}}
+</style>
+
+<main>
+  <header>
+    <h1>Roman Urdu Leaderboard</h1>
+    <p class="lede">How well do AI models read, write and understand Roman Urdu, the way most Pakistanis type? Every test item comes from text written or romanized by people. Scores run from 0 to 100; higher is better.</p>
+  </header>
+
+  <div class="sample" aria-label="Example transliteration item">
+    <div class="rom"><small>Roman Urdu input</small>un ke walid syed ali akbar khui nami girami aalim aur shaikh abdullah mamqaani ke shagird the.</div>
+    <div class="arrow">→</div>
+    <div class="ur"><small>Expected Urdu script</small>ان کے والد سید علی اکبر خوئی نامی گرامی عالم اور شیخ عبداللہ مامقانی کے شاگرد تھے۔</div>
+  </div>
+
+  <div class="findings" id="findings"></div>
+
+  <div>
+    <div class="tablewrap"><table id="t"></table></div>
+    <p class="note" id="note"></p>
+  </div>
+
+  <section>
+    <h2>The tasks</h2>
+    <dl>
+      <dt>Transliteration (300 sentences)</dt><dd>Roman Urdu to Urdu script. Urdu Wikipedia sentences romanized by native speakers (Google's Dakshina set). Score is 100 minus the character error rate, after removing diacritics and unifying letter variants.</dd>
+      <dt>Reading (300 questions)</dt><dd>Multiple choice on Roman Urdu passages (Meta's Belebele, romanized by annotators). Accuracy.</dd>
+      <dt>Translation (120 passages)</dt><dd>Roman Urdu into English, scored with chrF++ against the original English (FLORES). Shown, but not counted in Overall: one model reproduced 45 of the 120 English references almost word for word, which points to the text being in its training data.</dd>
+      <dt>Sentiment (300 comments)</dt><dd>Real Roman Urdu social-media comments, 100 each positive, negative and neutral (UCI Roman Urdu dataset). Macro F1. The source labels are noisy, so no model gets near 100.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>How models were run</h2>
+    <p>Every model sees the same instructions. Models with an API run one item at a time at temperature 0. Models only available through a chat app (ChatGPT, claude.ai) got the same items in numbered batches of 15 to 50, each batch in a fresh temporary chat. Open models ran locally through Ollama at 4-bit. The highlighted row is our own 1.5B model, fine-tuned for transliteration only on Dakshina sentences that are not in the test set.</p>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</main>
+
+<script>
+const B = {"tasks": ["translit", "reading", "translate_en", "sentiment"], "overall_tasks": ["translit", "reading", "sentiment"], "models": [{"slug": "claude__fable-5.2", "name": "Claude Fable 5.2 (claude.ai, medium effort)", "org": "Anthropic", "weights": "closed", "via": "chat app, batched", "flag": {"translate_en": "Reproduces 45 of 120 English references near-verbatim: likely seen in training"}, "tasks": {"translit": {"score": 98.6, "cer": 1.44, "wer": 5.96}, "reading": {"score": 88.7}, "translate_en": {"score": 86.3}, "sentiment": {"score": 69.8, "acc": 69.7}}, "cost_usd": 0.0, "complete": true, "overall": 85.7}, {"slug": "chatgpt__gpt-6", "name": "GPT-6 (ChatGPT, medium thinking)", "org": "OpenAI", "weights": "closed", "via": "chat app, batched", "tasks": {"translit": {"score": 98.4, "cer": 1.63, "wer": 6.66}, "reading": {"score": 86.0}, "translate_en": {"score": 64.3}, "sentiment": {"score": 71.0, "acc": 71.0}}, "cost_usd": 0.0, "complete": true, "overall": 85.1}, {"slug": "ollama__llama3.1_8b", "name": "Llama 3.1 8B Instruct", "org": "Meta", "weights": "open", "via": "local (Ollama, Q4)", "tasks": {"translit": {"score": 87.5, "cer": 12.46, "wer": 25.85}, "reading": {"score": 33.3}, "translate_en": {"score": 46.2}, "sentiment": {"score": 57.0, "acc": 58.7}}, "cost_usd": 0.0, "complete": true, "overall": 59.3}, {"slug": "ollama__qwen2.5_7b-instruct", "name": "Qwen2.5 7B Instruct", "org": "Alibaba", "weights": "open", "via": "local (Ollama, Q4)", "tasks": {"translit": {"score": 72.4, "cer": 27.63, "wer": 51.91}, "reading": {"score": 39.7}, "translate_en": {"score": 42.8}, "sentiment": {"score": 54.4, "acc": 54.0}}, "cost_usd": 0.0, "complete": true, "overall": 55.5}, {"slug": "ollama__qwen2.5_3b-instruct", "name": "Qwen2.5 3B Instruct", "org": "Alibaba", "weights": "open", "via": "local (Ollama, Q4)", "tasks": {"translit": {"score": 62.0, "cer": 38.05, "wer": 63.48}, "reading": {"score": 29.7}, "translate_en": {"score": 36.2}, "sentiment": {"score": 54.3, "acc": 55.7}}, "cost_usd": 0.0, "complete": true, "overall": 48.7}, {"slug": "m2m100__rup_rur_to_ur", "name": "m2m100 418M Roman Urdu transliterator (Butt et al. 2025)", "org": "Butt et al.", "weights": "open", "via": "local, 4 beams", "tasks": {"translit": {"score": 92.7, "cer": 7.29, "wer": 19.17}}, "cost_usd": 0.0, "complete": false}, {"slug": "ollama__gpt-oss_20b", "name": "gpt-oss 20B", "org": "OpenAI", "weights": "open", "via": "local (Ollama, low reasoning)", "tasks": {"translit": {"score": 90.2, "cer": 9.8, "wer": 21.27}}, "cost_usd": 0.0, "complete": false}, {"slug": "ollama__qwen3_14b", "name": "Qwen3 14B", "org": "Alibaba", "weights": "open", "via": "local (Ollama, Q4, thinking off)", "tasks": {"translit": {"score": 90.1, "cer": 9.94, "wer": 22.42}}, "cost_usd": 0.0, "complete": false}, {"slug": "ours__qwen2.5-1.5b-translit-v2", "name": "Ours: Qwen2.5-1.5B + LoRA (transliteration only)", "org": "Masood Ahmed", "weights": "open", "via": "local, 1-hour fine-tune on one GPU", "ours": true, "tasks": {"translit": {"score": 95.3, "cer": 4.74, "wer": 12.84}}, "cost_usd": 0.0, "complete": false}, {"slug": "ours__qwen3-8b-translit", "name": "Ours: Qwen3-8B + QLoRA (transliteration only)", "org": "Masood Ahmed", "weights": "open", "via": "local, 68-min fine-tune on one GPU", "ours": true, "tasks": {"translit": {"score": 96.4, "cer": 3.6, "wer": 10.19}}, "cost_usd": 0.0, "complete": false}]};
+const T = B.tasks, OV = B.overall_tasks || T;
+const NAMES = {translit:"Translit.", reading:"Reading", translate_en:"Translation", sentiment:"Sentiment"};
+let key = "overall", dir = -1;
+const val = (r,k) => k==="overall" ? (r.overall ?? null) : (r.tasks[k]?.score ?? null);
+const best = k => Math.max(...B.models.map(r=>val(r,k)).filter(v=>v!==null));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function findings(){
+  const full = B.models.filter(r=>r.overall!=null).sort((a,b)=>b.overall-a.overall);
+  const ours = B.models.filter(r=>r.ours && r.tasks.translit).sort((a,b)=>b.tasks.translit.score-a.tasks.translit.score)[0];
+  const openT = B.models.filter(r=>!r.ours && r.weights==="open" && r.tasks.translit).sort((a,b)=>b.tasks.translit.score-a.tasks.translit.score)[0];
+  const topT = B.models.filter(r=>!r.ours && r.tasks.translit).sort((a,b)=>b.tasks.translit.score-a.tasks.translit.score)[0];
+  const out = [];
+  if(full[0]) out.push([full[0].overall.toFixed(1), `Top overall: ${full[0].name}`]);
+  if(ours && topT) out.push([ours.tasks.translit.score.toFixed(1), `Our ${(ours.name.match(/\d+(\.\d+)?B/)||["fine-tuned"])[0]} model on transliteration, against ${topT.tasks.translit.score.toFixed(1)} for ${topT.name.split(" (")[0]}`]);
+  if(ours && openT) out.push([`+${(ours.tasks.translit.score-openT.tasks.translit.score).toFixed(1)}`, `Our model over ${openT.name}, the best other open model we ran, on transliteration`]);
+  document.getElementById("findings").innerHTML = out.map(([n,t])=>`<div class="finding"><b>${esc(n)}</b><span>${esc(t)}</span></div>`).join("");
+}
+
+function render(){
+  const rows = [...B.models].sort((a,b)=>{const x=val(a,key),y=val(b,key); if(x===null) return 1; if(y===null) return -1; return dir*(x-y)});
+  const cols = [["rank","#"],["model","Model"],["overall","Overall"],...T.map(t=>[t,NAMES[t]||t])];
+  const bests = Object.fromEntries(["overall",...T].map(k=>[k,best(k)]));
+  let h = "<thead><tr>" + cols.map(([k,n])=>{
+    const sortable = !(k==="rank"||k==="model");
+    const label = n + (key===k ? (dir<0?" ↓":" ↑") : "");
+    return `<th class="${k==="model"?"l":""}" scope="col">${sortable?`<button type="button" data-k="${k}">${label}</button>`:label}</th>`;
+  }).join("") + "</tr></thead><tbody>";
+  let rank = 0, flagged = false;
+  for(const r of rows){
+    if(r.overall!=null) rank++;
+    const w = r.weights ? `<span class="tag ${r.weights}">${r.weights}</span>` : "";
+    h += `<tr class="${r.ours?"ours":""}"><td class="rank">${r.overall!=null?rank:""}</td>`;
+    h += `<td class="l"><div class="nm">${esc(r.name||r.slug)}${w}</div><div class="via">${esc([r.org,r.via].filter(Boolean).join(" · "))}</div></td>`;
+    const ov = r.overall;
+    h += ov==null ? `<td class="dash">–</td>` : `<td class="${ov===bests.overall?"best":""}"><div class="overall"><span class="bar" aria-hidden="true"><i style="width:${ov}%"></i></span>${ov.toFixed(1)}</div></td>`;
+    for(const k of T){
+      const v = val(r,k), f = r.flag && r.flag[k];
+      if(f) flagged = true;
+      h += v===null ? `<td class="dash">–</td>` : `<td class="${f?"flag":(v===bests[k]?"best":"")}" ${f?`title="${esc(f)}"`:""}>${v.toFixed(1)}</td>`;
+    }
+    h += "</tr>";
+  }
+  document.getElementById("t").innerHTML = h + "</tbody>";
+  document.querySelectorAll("th button").forEach(b=>b.onclick=()=>{const k=b.dataset.k; dir = key===k ? -dir : -1; key=k; render()});
+  document.getElementById("note").textContent = "Overall is the mean of transliteration, reading and sentiment." + (flagged ? " * Likely seen in training: the model reproduced many English reference passages almost word for word." : "");
+}
+findings(); render();
+document.getElementById("foot").textContent = `Version 1 · ${B.models.length} models so far · built by Masood Ahmed`;
+</script>
